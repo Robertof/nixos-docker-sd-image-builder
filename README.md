@@ -11,8 +11,8 @@ used to emulate `AArch64` and [`binfmt_misc`](https://en.wikipedia.org/wiki/Binf
 allow transparent execution of AArch64 binaries.
 
 ## Quick start
-Start by cloning this repo and adding your SSH key(s) in [`sd-image.nix`](sd-image.nix) by replacing
-the existing `ssh-ed25519 ...` placeholder. Customize `sd-image.nix` as you like.
+Start by cloning this repo and adding your SSH key(s) in [`sd-card.nix`](sd-card.nix) by replacing
+the existing `ssh-ed25519 ...` placeholder. Customize `sd-card.nix` as you like.
 
 Ensure that your [Docker](https://www.docker.com/) is set up and you have a working installation of
 [Docker Compose](https://docs.docker.com/compose/), then just run (as root):
