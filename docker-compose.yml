@@ -1,0 +1,64 @@
+# Compose file which provides automagic building of NixOS SD images for AArch64 systems. Will
+# setup an emulation layer to run AArch64 transparently and clean it up after it's done.
+# Take care if running this with an existing `binfmt_misc` configuration.
+# Comes out with sane defaults, feel free to configure as needed.
+# NOTE: the configuration used to build NixOS resides in this directory as `sd-image.nix`
+
+version: "3"
+
+services:
+  # This is the first container and image, responsible for setting up QEMU. In the future, this
+  # can be replaced with `multiarch/qemu-user-static` when it supports at least QEMU 5.0.
+  setup-qemu:
+    image: qemu-handler
+    build:
+      context: setup-qemu
+      args:
+        QEMU_PKG_URL: "http://ftp.debian.org/debian/pool/main/q/qemu/qemu-user-static_5.0-4_amd64.deb"
+        QEMU_PKG_HASH: "67504130c4f63371746deb91b01433af4644cfebaeaa3a120535c6f7e54f6dcd"
+        QEMU_SCRIPT_REPO_REVISION: "cb936b0aad7b4e46c183bf52287cab3192cb58fa" # 5.0
+    environment:
+      # Cleans up previous registrations of `qemu-aarch64`. This won't fail if none exists.
+      # note: to disable, comment or remove this -- changing its value will have no effects.
+      CLEAR_PREVIOUS_QEMU_BINFMT: "y"
+    privileged: true
+  # Main container, requires no elevated privileges to run. Builds NixOS.
+  build-nixos:
+    build:
+      context: build-nixos
+      args:
+        NIXPKGS_URL: "https://github.com/nixos/nixpkgs"
+        NIXPKGS_BRANCH: "release-20.03"
+        # Applies https://github.com/NixOS/nixpkgs/pull/86366 on top of the cloned tree.
+        # Enable this if your build fails due to a filesystem resizing failure.
+        # note: to disable, comment or remove this -- changing its value will have no effects.
+        # APPLY_RESIZE2FS_PATCH: "y"
+    working_dir: /home/nixos
+    depends_on:
+      - setup-qemu
+    # Main command line, left here so it can be changed easily. The container will:
+    # - setup the environment. This includes adding the Nix executables to $PATH, along with the
+    #   registration of an EXIT handler which will send a signal to `cleanup-qemu` when done.
+    # - wait until `setup-qemu` is done by attempting to run an AArch64 binary.
+    # - build the actual SD image.
+    # - copy it to /build, which points by default to this directory.
+    command: [sh, -c, ". setup-env && \
+                       sh wait-for-qemu.sh && \
+                       nix-build \
+                         -A config.system.build.sdImage \
+                         --option system aarch64-linux \
+                         --option sandbox false \
+                         -I nixos-config=/build/sd-card.nix \
+                         nixpkgs/nixos/default.nix && \
+                       cp result/sd-image/* /build && chmod u+w /build/*.img"]
+    volumes:
+    - .:/build
+  # Cleanup. Waits until `build-nixos` is done via a TCP socket, then cleans up any `binfmt_misc`
+  # handler registered to QEMU.
+  cleanup-qemu:
+    image: qemu-handler
+    environment:
+      QEMU_CLEANUP: "y"
+    privileged: true
+    depends_on:
+      - build-nixos
