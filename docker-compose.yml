@@ -16,11 +16,6 @@ services:
       args:
         QEMU_PKG_URL: "http://ftp.debian.org/debian/pool/main/q/qemu/qemu-user-static_5.0-4_amd64.deb"
         QEMU_PKG_HASH: "67504130c4f63371746deb91b01433af4644cfebaeaa3a120535c6f7e54f6dcd"
-        QEMU_SCRIPT_REPO_REVISION: "cb936b0aad7b4e46c183bf52287cab3192cb58fa" # 5.0
-    environment:
-      # Cleans up previous registrations of `qemu-aarch64`. This won't fail if none exists.
-      # note: to disable, comment or remove this -- changing its value will have no effects.
-      CLEAR_PREVIOUS_QEMU_BINFMT: "y"
     privileged: true
   # Main container, requires no elevated privileges to run. Builds NixOS.
   build-nixos:
