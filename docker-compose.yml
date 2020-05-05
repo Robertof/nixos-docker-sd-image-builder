@@ -50,7 +50,7 @@ services:
                          --option sandbox false \
                          -I nixos-config=/build/sd-card.nix \
                          nixpkgs/nixos/default.nix && \
-                       cp result/sd-image/* /build && chmod u+w /build/*.img"]
+                       sudo cp result/sd-image/* /build && chmod u+w /build/*.img"]
     volumes:
     - .:/build
   # Cleanup. Waits until `build-nixos` is done via a TCP socket, then cleans up any `binfmt_misc`
