@@ -30,7 +30,6 @@ docker-compose down --rmi all -v
 
 **WARNING**: This interacts with the host kernel to set up a `binfmt_misc` handler to execute
 AArch64 binaries. Due to this, some containers have to be executed with the `--privileged` flag.
-**If you have existing `binfmt_misc` handlers registered to QEMU, they will be removed!**
 
 ## Troubleshooting
 
@@ -70,7 +69,6 @@ Here's how it works in detail:
       the time of writing, the downloaded version is 5.0.
     - verify the integrity of the downloaded binaries with an hardcoded hash.
     - extract `qemu-aarch64-static` from the package.
-    - download the script from `git.qemu.org` to register QEMU as a `binfmt_misc` handler.
   - then, Docker builds `build-nixos`, which will:
     - create an unprivileged user for the NixOS build.
     - download and bootstrap Nix with the default configuration.
@@ -79,15 +77,15 @@ Here's how it works in detail:
     - prepare an environment file which adds Nix to `$PATH`, sets `NIX_HOME` and sets a trap which
       notifies the cleanup container using TCP when the build is done.
   - once all the images are built, `setup-qemu` runs (with privileges), and it will:
-    - remove existing `binfmt_misc` handlers that start with `qemu` (configurable in
-      `docker-compose.yml`)
+    - check if a `binfmt_misc` entry which has the same interpreter name exists 
+      (`qemu-aarch64-docker-nixos`), removing it if so
     - register `qemu-aarch64-bin` as a `binfmt_misc` handler for AArch64 with the `fix-binary` flag,
-      which allows to dispose of the QEMU binary (by destroying the container)
+      which allows `binfmt_misc` to keep working when the container is destroyed
   - `build-nixos` will be started concurrently (without privileges), and it will:
     - wait until the system is able to understand and execute AArch64 binaries
     - bootstrap the environment
     - build the image
-    - copy the image to `/build` (shared volume)
+    - copy the image to `/build` as `root` (shared volume)
     - notify `cleanup-qemu` via a simple `nc` call
   - last but not least, `cleanup-qemu` will also be started concurrently (with privileges), and it
     will:
@@ -97,7 +95,8 @@ Here's how it works in detail:
 
 ## TODO
 
-- [ ] Use a unique name as the `binfmt_misc` handler so that it's not needed to nuke the other
+- [x] Use a unique name as the `binfmt_misc` handler so that it's not needed to nuke the other
   pre-existing QEMU handlers on the system.
-- [ ] Use a custom script to register QEMU as a `binfmt_misc` handler instead of patching the
+- [x] Use a custom script to register QEMU as a `binfmt_misc` handler instead of patching the
   original one.
+- [ ] Support native `aarch64` compilation
