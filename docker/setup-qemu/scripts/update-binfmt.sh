@@ -10,7 +10,6 @@ readonly AARCH64_MASK='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\
 case "$(uname -m)" in
 arm|armel|armhf|arm64|armv[4-9]*l|aarch64)
   echo "binfmt: detected native ARM build box, skipping binfmt setup!"
-  export SKIP_BINFMT=y
   exit 0
   ;;
 amd64|i386|i486|i586|i686|i86pc|BePC|x86_64)

@@ -1,4 +1,6 @@
-FROM alpine:latest
+ARG IMAGE_BASE
+
+FROM ${IMAGE_BASE}alpine:latest
 
 ARG QEMU_PKG_URL
 ARG QEMU_PKG_HASH
