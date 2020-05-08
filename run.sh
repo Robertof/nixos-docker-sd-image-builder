@@ -1,5 +1,4 @@
 #!/bin/sh
-
 set -u
 
 if ! command -v "docker-compose" >/dev/null 2>&1; then
@@ -36,5 +35,18 @@ readonly COMPOSE_ACTION="${1-up}"
 COMPOSE_ARGS="-f ./docker/docker-compose.yml"
 [ -n "$WANTS_EMULATION" ] && COMPOSE_ARGS="$COMPOSE_ARGS -f ./docker/docker-compose.emulation.yml"
 
+# determine whether to use `sudo` or not
+# thanks to masnagam/sbc-scripts for inspiration
+if [ "$(uname)" != Linux ] || [ "$(id -u)" -eq 0 ] || id -nG | grep -q docker; then
+  readonly DOCKER_COMPOSE="docker-compose"
+else
+  if command -v "sudo" >/dev/null 2>&1; then
+    readonly DOCKER_COMPOSE="sudo docker-compose"
+  else
+    echo "warning: you might need to run this script as root"
+    readonly DOCKER_COMPOSE="docker-compose"
+  fi
+fi
+
 set -x
-docker-compose $COMPOSE_ARGS $COMPOSE_ACTION "$@"
+$DOCKER_COMPOSE $COMPOSE_ARGS $COMPOSE_ACTION "$@"
