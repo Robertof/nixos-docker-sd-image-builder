@@ -31,8 +31,7 @@ esac
 
 # Default 
 readonly COMPOSE_ACTION="${1-up}"
-
-shift
+[ "$#" -ne 0 ] && shift
 
 COMPOSE_ARGS="-f ./docker/docker-compose.yml"
 [ -n "$WANTS_EMULATION" ] && COMPOSE_ARGS="$COMPOSE_ARGS -f ./docker/docker-compose.emulation.yml"
