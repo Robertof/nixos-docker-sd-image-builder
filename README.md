@@ -10,7 +10,11 @@ device without attaching a display.**
 used to emulate `AArch64` and [`binfmt_misc`](https://en.wikipedia.org/wiki/Binfmt_misc) is used to
 allow transparent execution of AArch64 binaries.
 
+A Terraform specification is provided in [`terraform/`](terraform/) which allows to build an
+SD image using a native AArch64 instance provided by Amazon EC2. It takes less than 10 minutes!
+
 ## Quick start
+
 Start by cloning this repo and adding your SSH key(s) in [`sd-card.nix`](sd-card.nix) by replacing
 the existing `ssh-ed25519 ...` placeholder. Customize `sd-card.nix` as you like.
 
@@ -33,6 +37,12 @@ directory. To free up the space used by the containers, just run:
 
 **WARNING**: This interacts with the host kernel to set up a `binfmt_misc` handler to execute
 AArch64 binaries. Due to this, some containers have to be executed with the `--privileged` flag.
+
+## Building on AWS (EC2)
+
+To quickly build an SD image using a native AArch64 EC2 instance, head over to the
+[`terraform/`](terraform/) subdirectory which has a [Terraform](https://www.terraform.io/)
+specification to do it in two commands and less than 10 minutes.
 
 ## Troubleshooting
 
