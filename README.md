@@ -1,7 +1,7 @@
 # NixOS Docker-based SD image builder
 This repository allows you to build a custom SD image of NixOS for your Raspberry Pi (or any other
-supported AArch64 device) in about 15-20 minutes on a modern system, without installing any
-additional dependencies. 
+supported AArch64 device) in about 15-20 minutes on a modern `x86_64` system or about 5 minutes on a
+powerful `AArch64` box, without installing any additional dependencies. 
 
 The default configuration enables OpenSSH out of the box, **allowing to install NixOS on an embedded
 device without attaching a display.**
