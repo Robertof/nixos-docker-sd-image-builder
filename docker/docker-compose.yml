@@ -15,10 +15,11 @@ services:
         IMAGE_BASE: $IMAGE_BASE
         NIXPKGS_URL: "https://github.com/nixos/nixpkgs"
         NIXPKGS_BRANCH: "release-20.03"
-        # Applies https://github.com/NixOS/nixpkgs/pull/86366 on top of the cloned tree.
-        # Enable this if your build fails due to a filesystem resizing failure.
+        # Applies https://github.com/NixOS/nixpkgs/pull/82718 on top of the cloned tree.
+        # Enable this if your build fails due to cptofs errors (including out of memory) or when
+        # having a filesystem resizing failure.
         # note: to disable, comment or remove this -- changing its value will have no effects.
-        # APPLY_RESIZE2FS_PATCH: "y"
+        # APPLY_CPTOFS_PATCH: "y"
     working_dir: /home/nixos
     # Main command line, left here so it can be changed easily. The container will:
     # - setup the environment. This includes adding the Nix executables to $PATH, along with the

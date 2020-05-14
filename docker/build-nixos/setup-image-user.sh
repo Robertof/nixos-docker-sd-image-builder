@@ -21,9 +21,9 @@ git clone --depth=1 -b "$NIXPKGS_BRANCH" "$NIXPKGS_URL" nixpkgs
 
 cd nixpkgs
 
-if [ -n "${APPLY_RESIZE2FS_PATCH+x}" ]; then
+if [ -n "${APPLY_CPTOFS_PATCH+x}" ]; then
   echo "applying patch to make-ext4-fs script..."
-  curl -L "https://github.com/NixOS/nixpkgs/pull/86366.patch" | git apply
+  curl -L "https://github.com/NixOS/nixpkgs/pull/82718.patch" | git apply
 fi
 
 echo "image is ready"

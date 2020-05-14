@@ -4,7 +4,7 @@ FROM ${IMAGE_BASE}alpine:latest
 
 ARG NIXPKGS_URL
 ARG NIXPKGS_BRANCH
-ARG APPLY_RESIZE2FS_PATCH
+ARG APPLY_CPTOFS_PATCH
 
 RUN apk add curl git sudo
 RUN adduser -D nixos

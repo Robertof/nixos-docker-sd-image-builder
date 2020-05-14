@@ -56,16 +56,16 @@ branch._
   with the `--privileged` Docker flag.
 - Ensure you have enough memory/swap and disk space. This can require up to 8 GiB of RAM and ~6-7
   GiB of disk space.
-- If the build fails with something like:
+- If the build fails with `cptofs` related errors or something like:
   ```
   Resizing to minimum allowed size
   resize2fs 1.45.5 (07-Jan-2020)
   Please run 'e2fsck -f temp.img' first.
   ```
-  This is a known issue in `nixpkgs` (https://github.com/NixOS/nixpkgs/pull/86366), please edit
-  `docker-compose.yml` and uncomment `APPLY_RESIZE2FS_PATCH`. If you want to learn more, I
-  [investigated this issue and wrote about
-  it](https://rbf.dev/blog/2020/04/why-doesnt-resize2fs-resize-my-fs/).
+  This is a known issue (see [[1]](https://github.com/NixOS/nixpkgs/pull/86366) and
+  [[2]](https://github.com/NixOS/nixpkgs/pull/82718)). Please edit
+  `docker-compose.yml` and uncomment `APPLY_CPTOFS_PATCH`. If you want to learn more, I
+  [investigated this issue and wrote about it](https://rbf.dev/blog/2020/04/why-doesnt-resize2fs-resize-my-fs/).
 - For any other problem, open an issue or email me!
 
 ## Details
