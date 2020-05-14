@@ -5,6 +5,7 @@ FROM ${IMAGE_BASE}alpine:latest
 ARG NIXPKGS_URL
 ARG NIXPKGS_BRANCH
 ARG APPLY_CPTOFS_PATCH
+ARG DISABLE_ZFS_IN_INSTALLER
 
 RUN apk add curl git sudo
 RUN adduser -D nixos
@@ -18,7 +19,8 @@ RUN echo 'Set disable_coredump false' >> /etc/sudo.conf
 RUN echo -e 'nixos ALL=(ALL) ALL\nnixos ALL=(root) NOPASSWD: /bin/cp' >> /etc/sudoers
 
 COPY --chown=nixos:nixos *.sh /home/nixos/
-COPY --chown=nixos:nixos aarch64-tester /home/nixos
+COPY --chown=nixos:nixos aarch64-tester /home/nixos/
+COPY --chown=nixos:nixos *.patch /home/nixos/
 
 USER nixos
 ENV USER=nixos

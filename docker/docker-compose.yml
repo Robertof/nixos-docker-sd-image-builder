@@ -19,7 +19,10 @@ services:
         # Enable this if your build fails due to cptofs errors (including out of memory) or when
         # having a filesystem resizing failure.
         # note: to disable, comment or remove this -- changing its value will have no effects.
-        # APPLY_CPTOFS_PATCH: "y"
+        #APPLY_CPTOFS_PATCH: "y"
+        # Disables ZFS support in the installer. This can significantly reduce build times
+        # of the Raspberry Pi 4 image.
+        #DISABLE_ZFS_IN_INSTALLER: "y"
     working_dir: /home/nixos
     # Main command line, left here so it can be changed easily. The container will:
     # - setup the environment. This includes adding the Nix executables to $PATH, along with the

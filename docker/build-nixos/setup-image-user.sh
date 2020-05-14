@@ -26,4 +26,9 @@ if [ -n "${APPLY_CPTOFS_PATCH+x}" ]; then
   curl -L "https://github.com/NixOS/nixpkgs/pull/82718.patch" | git apply
 fi
 
+if [ -n "${DISABLE_ZFS_IN_INSTALLER+x}" ]; then
+  echo "disabling zfs..."
+  patch nixos/modules/profiles/base.nix $HOME/disable-zfs.patch
+fi
+
 echo "image is ready"
