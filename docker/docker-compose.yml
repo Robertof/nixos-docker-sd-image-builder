@@ -34,7 +34,7 @@ services:
                          -A config.system.build.sdImage \
                          --option system aarch64-linux \
                          --option sandbox false \
-                         -I nixos-config=/build/config/sd-card.nix \
+                         -I nixos-config=/build/config/sd-image.nix \
                          nixpkgs/nixos/default.nix && \
                        chmod u+w result/sd-image/* && sudo cp result/sd-image/* /build"]
     volumes:

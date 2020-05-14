@@ -1,6 +1,8 @@
 { lib, ... }: {
   imports = [
-    <nixpkgs/nixos/modules/installer/cd-dvd/sd-image-aarch64.nix>
+    # Select your destination system here. Available choices are either 'rpi3' or 'rpi4'
+    # (without quotes).
+    ./rpi4
   ];
   # The installer starts with a "nixos" user to allow installation, so add the SSH key to
   # that user. Note that the key is, at the time of writing, put in `/etc/ssh/authorized_keys.d`
