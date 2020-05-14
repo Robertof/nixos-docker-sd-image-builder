@@ -19,9 +19,19 @@
 
   boot.consoleLogLevel = lib.mkDefault 7;
 
+  # Increase `cma` to 64M to allow to use all of the RAM.
+  # NOTE: this disables the serial console. Add
+  # "console=ttyS0,115200n8" "console=ttyAMA0,115200n8" to restore.
+  boot.kernelParams = ["cma=64M" "console=tty0"];
+
   sdImage = {
+    # This might need to be increased when deploying multiple configurations.
     firmwareSize = 128;
+    # TODO: check if needed.
+    populateFirmwareCommands =
+      "${config.system.build.installBootLoader} ${config.system.build.toplevel} -d ./firmware";
     # /var/empty is needed for some services, such as sshd
+    # XXX: This might not be needed anymore, adding to be extra sure.
     populateRootCommands = "mkdir -p ./files/var/empty";
   };
 
