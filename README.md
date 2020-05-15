@@ -13,14 +13,32 @@ allow transparent execution of AArch64 binaries.
 A Packer specification is provided in [`packer/`](packer/) which allows to build an
 SD image using a native AArch64 instance provided by Amazon EC2. It takes less than 10 minutes!
 
+## Supported devices
+
+Out of the box this supports:
+
+- any device supported by the `sd-image-aarch64` builder of NixOS. This includes the
+  **Raspberry Pi 3** and other devices listed [here](https://nixos.wiki/wiki/NixOS_on_ARM).
+- **Raspberry Pi 4.**
+
+Any other device can be supported by changing the configuration files in [`config/`](config/).
+
 ## Quick start
 
-Start by cloning this repo and adding your SSH key(s) in [`config/sd-card.nix`](config/sd-card.nix)
-by replacing the existing `ssh-ed25519 ...` placeholder. Customize `sd-card.nix` (or add more
-files) as you like.
+Start by cloning this repo and opening [`config/sd-image.nix`](config/sd-image.nix) in your favorite
+editor. Then:
 
-Ensure that your [Docker](https://www.docker.com/) is set up and you have a working installation of
-[Docker Compose](https://docs.docker.com/compose/), then just run:
+- choose the target device by following the instructions in the file;
+- add your SSH key(s) by replacing the existing `ssh-ed25519 ...` placeholder.
+
+Customize `sd-card.nix` (or add more files) as you like, they will be copied to the container.
+
+_Protip: if you're building for a Raspberry Pi 4 and don't need ZFS, enable
+`DISABLE_ZFS_IN_INSTALLER` in [`docker/docker-compose.yml`](docker/docker-compose.yml) to speed
+up the build._
+
+Finally, ensure that your [Docker](https://www.docker.com/) is set up and you have a working
+installation of [Docker Compose](https://docs.docker.com/compose/), then just run:
 
 ```sh
 ./run.sh
