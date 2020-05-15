@@ -1,8 +1,10 @@
 { lib, ... }: {
   imports = [
-    # Select your destination system here. Available choices are either 'rpi3' or 'rpi4'
-    # (without quotes).
-    ./rpi4
+    # Select your destination system here. Available choices are:
+    # - generic-aarch64
+    # - rpi3 (alias for generic-aarch64)
+    # - rpi4
+    ./rpi3
   ];
 
   # The installer starts with a "nixos" user to allow installation, so add the SSH key to
