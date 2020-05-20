@@ -12,8 +12,8 @@ services:
     build:
       context: setup-qemu
       args:
-        QEMU_PKG_URL: "http://ftp.debian.org/debian/pool/main/q/qemu/qemu-user-static_5.0-4_amd64.deb"
-        QEMU_PKG_HASH: "67504130c4f63371746deb91b01433af4644cfebaeaa3a120535c6f7e54f6dcd"
+        QEMU_PKG_URL: "https://kojipkgs.fedoraproject.org/packages/qemu/5.0.0/2.fc33/x86_64/qemu-user-static-5.0.0-2.fc33.x86_64.rpm"
+        QEMU_PKG_HASH: "23d937fba676db4c7546b6b30469f2a7d92d480cfcf4bcd3e7fc86587dec085f"
         IMAGE_BASE: $IMAGE_BASE
     privileged: true
   # Main container, requires no elevated privileges to run. Builds NixOS.
