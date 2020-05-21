@@ -84,6 +84,12 @@ branch._
   [[2]](https://github.com/NixOS/nixpkgs/pull/82718)). Please edit
   `docker-compose.yml` and uncomment `APPLY_CPTOFS_PATCH`. If you want to learn more, I
   [investigated this issue and wrote about it](https://rbf.dev/blog/2020/04/why-doesnt-resize2fs-resize-my-fs/).
+- If you are running Docker Toolbox on Windows, you might encounter weird "file not found" errors
+  when Nix attempts to find your configuration files. This is due to the fact that Docker Toolbox
+  uses VirtualBox to run Docker and `C:\Users` is the only directory shared by default -- thus,
+  if you're storing your files in any other path you might run into the issue.
+  Follow [the instructions detailed in this great post](https://web.archive.org/web/20200521000637/https://headsigned.com/posts/mounting-docker-volumes-with-docker-toolbox-for-windows/)
+  for ways to solve this. Thanks @dsferruzza!
 - For any other problem, open an issue or email me!
 
 ## Details
