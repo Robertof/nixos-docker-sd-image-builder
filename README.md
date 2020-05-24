@@ -35,7 +35,8 @@ Customize `sd-card.nix` (or add more files) as you like, they will be copied to 
 
 _Protip: if you're building for a Raspberry Pi 4 and don't need ZFS, enable
 `DISABLE_ZFS_IN_INSTALLER` in [`docker/docker-compose.yml`](docker/docker-compose.yml) to speed
-up the build._
+up the build. Please note that if you have already executed `run.sh` once, you need to rebuild
+the images after changing this flag using `./run.sh up --build`._
 
 Finally, ensure that your [Docker](https://www.docker.com/) is set up and you have a working
 installation of [Docker Compose](https://docs.docker.com/compose/), then just run:
@@ -82,7 +83,8 @@ branch._
   ```
   This is a known issue (see [[1]](https://github.com/NixOS/nixpkgs/pull/86366) and
   [[2]](https://github.com/NixOS/nixpkgs/pull/82718)). Please edit
-  `docker-compose.yml` and uncomment `APPLY_CPTOFS_PATCH`. If you want to learn more, I
+  `docker-compose.yml`, uncomment `APPLY_CPTOFS_PATCH` and rerun with `./run.sh up --build`.
+  If you want to learn more, I
   [investigated this issue and wrote about it](https://rbf.dev/blog/2020/04/why-doesnt-resize2fs-resize-my-fs/).
 - If you are running Docker Toolbox on Windows, you might encounter weird "file not found" errors
   when Nix attempts to find your configuration files. This is due to the fact that Docker Toolbox
