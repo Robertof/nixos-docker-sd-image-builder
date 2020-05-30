@@ -36,7 +36,7 @@ Customize `sd-card.nix` (or add more files) as you like, they will be copied to 
 _Protip: if you're building for a Raspberry Pi 4 and don't need ZFS, enable
 `DISABLE_ZFS_IN_INSTALLER` in [`docker/docker-compose.yml`](docker/docker-compose.yml) to speed
 up the build. Please note that if you have already executed `run.sh` once, you need to rebuild
-the images after changing this flag using `./run.sh up --build`._
+the images after changing this flag using `./run.sh up --build`. Remember to add `patch` to `RUN apk ...` in the `.docker/DockerFile`_
 
 Finally, ensure that your [Docker](https://www.docker.com/) is set up and you have a working
 installation of [Docker Compose](https://docs.docker.com/compose/), then just run:
@@ -92,6 +92,7 @@ branch._
   if you're storing your files in any other path you might run into the issue.
   Follow [the instructions detailed in this great post](https://web.archive.org/web/20200521000637/https://headsigned.com/posts/mounting-docker-volumes-with-docker-toolbox-for-windows/)
   for ways to solve this. Thanks @dsferruzza!
+- Failing commands like `bsdtar: Error opening archive: Can't initialize filter; unable to run program "zstd -d -qq"` might be due a preexisting alpine image. Delete it and run the script again.
 - For any other problem, open an issue or email me!
 
 ## Details
