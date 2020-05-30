@@ -36,7 +36,7 @@ Customize `sd-card.nix` (or add more files) as you like, they will be copied to 
 _Protip: if you're building for a Raspberry Pi 4 and don't need ZFS, enable
 `DISABLE_ZFS_IN_INSTALLER` in [`docker/docker-compose.yml`](docker/docker-compose.yml) to speed
 up the build. Please note that if you have already executed `run.sh` once, you need to rebuild
-the images after changing this flag using `./run.sh up --build`. Remember to add `patch` to `RUN apk ...` in the `.docker/DockerFile`_
+the images after changing this flag using `./run.sh up --build`._
 
 Finally, ensure that your [Docker](https://www.docker.com/) is set up and you have a working
 installation of [Docker Compose](https://docs.docker.com/compose/), then just run:
