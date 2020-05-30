@@ -92,6 +92,7 @@ branch._
   if you're storing your files in any other path you might run into the issue.
   Follow [the instructions detailed in this great post](https://web.archive.org/web/20200521000637/https://headsigned.com/posts/mounting-docker-volumes-with-docker-toolbox-for-windows/)
   for ways to solve this. Thanks @dsferruzza!
+- Failing commands like `bsdtar: Error opening archive: Can't initialize filter; unable to run program "zstd -d -qq"` might be due a preexisting alpine image. Delete it and run the script again.
 - For any other problem, open an issue or email me!
 
 ## Details
