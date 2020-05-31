@@ -23,6 +23,9 @@ Out of the box this supports:
 
 Any other device can be supported by changing the configuration files in [`config/`](config/).
 
+_Please note: the latest Raspberry Pi 4 model with 8 GiB of RAM is not yet supported upstream
+by NixOS._
+
 ## Quick start
 
 Start by cloning this repo and opening [`config/sd-image.nix`](config/sd-image.nix) in your favorite
@@ -68,6 +71,191 @@ _Before Packer, there was also a Terraform specification, but I removed it in fa
 one. It is still accessible in the
 [`terraform`](https://github.com/Robertof/nixos-docker-sd-image-builder/tree/terraform/terraform)
 branch._
+
+## Next steps
+
+Once an image is produced by the container it's sufficient to flash it to the SD card of your
+choice with any tool which can flash raw images onto block devices. There have been some reports
+of issues using Etcher on macOS, thus it might be easier to just use
+[`dd`](https://wiki.archlinux.org/index.php/USB_flash_installation_media#Using_dd).
+
+Hopefully, the flashed SD card should _just work_ on your device. The
+[unofficial wiki](https://nixos.wiki/wiki/NixOS_on_ARM/Raspberry_Pi) contains lots of resources
+for possible things you might need or that might go wrong when using NixOS on a Raspberry Pi.
+Check out the page for [all ARM devices](https://nixos.wiki/wiki/NixOS_on_ARM) too.
+
+### Platform-specific steps
+
+#### Raspberry Pi 3 and 4
+
+Once your Pi boots and you're logged in, you can generate a barebones configuration using
+`nixos-generate-config`.
+
+Please keep in mind the following:
+
+- the _installer configuration_ (which is the one you edited in the [`config/`](config/) folder) is
+  _different_ than the system configuration. The installer configuration is only used to build
+  the image -- **using an installer configuration on a production system is an error and will
+  lead to weirdness.**
+- the _system configuration_ will _not_ inherit from the installer configuration, thus any
+  relevant options (such as users, SSH keys, networking etc.) have to be configured again. Please
+  note that once you switch to the main system configuration **the `nixos` user will be removed**.
+
+That being said, here are some example _system configurations_ that are mostly ready to use for
+both the Pi 3 and Pi 4:
+
+<details>
+  <summary>Example configuration for the Pi 3</summary>
+  
+  ```nix
+  # Please read the comments!
+  { config, pkgs, lib, ... }:
+  {
+    # Boot
+    boot.loader.grub.enable = false;
+    boot.loader.raspberryPi.enable = true;
+    boot.loader.raspberryPi.version = 3;
+    boot.loader.raspberryPi.uboot.enable = true;
+
+    # Kernel configuration
+    boot.kernelPackages = pkgs.linuxPackages_latest;
+    boot.kernelParams = ["cma=32M"];
+
+    # Filesystems
+    fileSystems = {
+      "/" = {
+        device = "/dev/disk/by-label/NIXOS_SD";
+        fsType = "ext4";
+      };
+    };
+    swapDevices = [ { device = "/swapfile"; size = 1024; } ];
+
+    # Networking (see official manual or `/config/sd-image.nix` in this repo for other options)
+    networking.hostName = "nixpi"; # unleash your creativity!
+
+    # Packages
+    environment.systemPackages = with pkgs; [
+      # customize as needed!
+      vim git htop
+    ];
+
+    # Users
+    # === IMPORTANT ===
+    # Change `yourName` here with the name you'd like for your user!
+    users.users.yourName = {
+      isNormalUser = true;
+      # Don't forget to change the home directory too.
+      home = "/home/yourName";
+      # This allows this user to use `sudo`.
+      extraGroups = [ "wheel" ];
+      # SSH authorized keys for this user.
+      openssh.authorizedKeys.keys = [ "ssh-ed25519 ..." ];
+    };
+
+    # Miscellaneous
+    time.timeZone = "Europe/Rome"; # you probably want to change this -- otherwise, ciao!
+    services.openssh.enable = true;
+
+    # WARNING: if you remove this, then you need to assign a password to your user, otherwise
+    # `sudo` won't work. You can do that either by using `passwd` after the first rebuild or
+    # by setting an hashed password in the `users.users.yourName` block as `initialHashedPassword`.
+    security.sudo.wheelNeedsPassword = false;
+
+    # Nix
+    nix.gc.automatic = true;
+    nix.gc.options = "--delete-older-than 30d";
+    boot.cleanTmpDir = true;
+
+    # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
+    system.stateVersion = "20.03";
+  }
+  ```
+</details>
+
+<details>
+  <summary>Example configuration for the Pi 4</summary>
+  
+  ```nix
+  # Please read the comments!
+  { config, pkgs, lib, ... }:
+  {
+    # Boot
+    boot.loader.grub.enable = false;
+    boot.loader.raspberryPi.enable = true;
+    boot.loader.raspberryPi.version = 4;
+
+    # Kernel configuration
+    boot.kernelPackages = pkgs.linuxPackages_rpi4;
+    boot.kernelParams = ["cma=64M" "console=tty0"];
+
+    # Filesystems
+    fileSystems = {
+        # There is no U-Boot on the Pi 4 (yet) -- the firmware partition has to be mounted as /boot.
+        "/boot" = {
+            device = "/dev/disk/by-label/FIRMWARE";
+            fsType = "vfat";
+        };
+        "/" = {
+            device = "/dev/disk/by-label/NIXOS_SD";
+            fsType = "ext4";
+        };
+    };
+
+    swapDevices = [ { device = "/swapfile"; size = 1024; } ];
+
+    # Networking (see official manual or `/config/sd-image.nix` in this repo for other options)
+    networking.hostName = "nixpi"; # unleash your creativity!
+
+    # Packages
+    environment.systemPackages = with pkgs; [
+      # customize as needed!
+      vim git htop
+    ];
+
+    # Users
+    # === IMPORTANT ===
+    # Change `yourName` here with the name you'd like for your user!
+    users.users.yourName = {
+      isNormalUser = true;
+      # Don't forget to change the home directory too.
+      home = "/home/yourName";
+      # This allows this user to use `sudo`.
+      extraGroups = [ "wheel" ];
+      # SSH authorized keys for this user.
+      openssh.authorizedKeys.keys = [ "ssh-ed25519 ..." ];
+    };
+
+    # Miscellaneous
+    time.timeZone = "Europe/Rome"; # you probably want to change this -- otherwise, ciao!
+    services.openssh.enable = true;
+
+    # WARNING: if you remove this, then you need to assign a password to your user, otherwise
+    # `sudo` won't work. You can do that either by using `passwd` after the first rebuild or
+    # by setting an hashed password in the `users.users.yourName` block as `initialHashedPassword`.
+    security.sudo.wheelNeedsPassword = false;
+
+    # Nix
+    nix.gc.automatic = true;
+    nix.gc.options = "--delete-older-than 30d";
+
+    # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
+    system.stateVersion = "20.03";
+  }
+  ```
+</details>
+
+Once you have a valid configuration in `/etc/nixos/configuration.nix`, run `nixos-rebuild switch`
+as `root`, and optionally run `nix-collect-garbage -d` to remove all the leftover stuff from the
+installation that is not required.
+
+For the Pi 3, see also
+[this excellent blog post](https://citizen428.net/blog/installing-nixos-raspberry-pi-3)
+which has step-by-step instructions for the whole process.
+
+For the Pi 4, you might want to check
+[these amazing instructions](https://gist.github.com/chrisanthropic/2e6d3645f20da8fd4c1f122113f89c06)
+written by @chrisanthropic. If you're running out of space on your firmware partition, this Gist
+also includes instructions on how to make an image with a bigger one.
 
 ## Troubleshooting
 
