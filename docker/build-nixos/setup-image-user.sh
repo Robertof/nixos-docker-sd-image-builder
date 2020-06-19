@@ -5,7 +5,7 @@ echo "building container as $USER"
 cd
 
 echo "setting up nix..."
-curl https://nixos.org/nix/install | sh -s --no-daemon
+curl -L https://nixos.org/nix/install | sh -s --no-daemon
 . /home/nixos/.nix-profile/etc/profile.d/nix.sh
 
 # .profile loading does not seem to work with alpine, so we have to compromise.
