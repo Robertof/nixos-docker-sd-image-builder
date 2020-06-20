@@ -19,12 +19,12 @@ Out of the box this supports:
 
 - any device supported by the `sd-image-aarch64` builder of NixOS. This includes the
   **Raspberry Pi 3** and other devices listed [here](https://nixos.wiki/wiki/NixOS_on_ARM).
-- **Raspberry Pi 4.**
+- **Raspberry Pi 4.** Please note that the latest Raspberry Pi 4 model with 8 GiB of RAM
+  is supported upstream only when building an image from the unstable branch. To do that,
+  open [`docker/docker-compose.yml`](docker/docker-compose.yml) and change `NIXPKGS_BRANCH`
+  to `master`.
 
 Any other device can be supported by changing the configuration files in [`config/`](config/).
-
-_Please note: the latest Raspberry Pi 4 model with 8 GiB of RAM is not yet supported upstream
-by NixOS._
 
 ## Quick start
 
