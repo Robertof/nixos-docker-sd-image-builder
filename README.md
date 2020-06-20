@@ -121,6 +121,9 @@ both the Pi 3 and Pi 4:
     boot.kernelPackages = pkgs.linuxPackages_latest;
     boot.kernelParams = ["cma=32M"];
 
+    # Enable additional firmware (such as Wi-Fi drivers).
+    hardware.enableRedistributableFirmware = true;
+
     # Filesystems
     fileSystems = {
       "/" = {
@@ -187,6 +190,9 @@ both the Pi 3 and Pi 4:
     # Kernel configuration
     boot.kernelPackages = pkgs.linuxPackages_rpi4;
     boot.kernelParams = ["cma=64M" "console=tty0"];
+
+    # Enable additional firmware (such as Wi-Fi drivers).
+    hardware.enableRedistributableFirmware = true;
 
     # Filesystems
     fileSystems = {
