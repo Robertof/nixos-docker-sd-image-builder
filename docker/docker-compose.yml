@@ -21,6 +21,7 @@ services:
         # note: to disable, comment or remove this -- changing its value will have no effects.
         # note: if changing this after having already executed `run.sh`, the containers need to
         # be rebuilt with `./run.sh up --build`.
+        # note: this PR was merged on the `master` branch.
         #APPLY_CPTOFS_PATCH: "y"
         # Disables ZFS support in the installer. This can significantly reduce build times
         # of the Raspberry Pi 4 image.
