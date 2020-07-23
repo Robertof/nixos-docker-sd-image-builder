@@ -23,7 +23,7 @@ cd nixpkgs
 
 if [ -n "${APPLY_CPTOFS_PATCH+x}" ]; then
   echo "applying patch to make-ext4-fs script..."
-  curl -L "https://github.com/NixOS/nixpkgs/pull/82718.patch" | git apply
+  curl -L "https://github.com/NixOS/nixpkgs/pull/82718.patch" | git apply || echo "warning: make-ext4-fs/cptofs patch failed to apply, might already be applied" 2>&1
 fi
 
 if [ -n "${DISABLE_ZFS_IN_INSTALLER+x}" ]; then
