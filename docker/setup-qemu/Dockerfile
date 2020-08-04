@@ -7,7 +7,7 @@ ARG QEMU_PKG_HASH
 
 COPY build/ scripts/ /root/
 WORKDIR /root
-RUN apk add libarchive-tools
+RUN apk add dpkg curl
 RUN sh /root/setup-image.sh
 
 CMD ["/bin/sh", "/root/run.sh"]
