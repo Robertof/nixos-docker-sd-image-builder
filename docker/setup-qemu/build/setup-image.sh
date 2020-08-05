@@ -6,11 +6,11 @@ if [ -z "${QEMU_PKG_URL+x}" ] || [ -z "${QEMU_PKG_HASH+x}" ]; then
     readonly DEBIAN_PKG_WEB_PAGE="https://packages.debian.org/unstable/amd64/qemu-user-static/download"
     curl -o /tmp/deb_pkg_page "$DEBIAN_PKG_WEB_PAGE"
     if ! QEMU_PKG_URL="$(grep -Eo "https?://ftp.debian.org.*_amd64\.deb" /tmp/deb_pkg_page)"; then
-        echo "unable to retrieve QEMU version from $DEBIAN_PKG_WEB_PAGE, please raise an issue" 2>&1
+        echo "unable to retrieve QEMU version from $DEBIAN_PKG_WEB_PAGE, please raise an issue" >&2
         exit 1
     fi
     if ! QEMU_PKG_HASH="$(grep SHA256 /tmp/deb_pkg_page | grep -o '<tt>.*</tt>' | sed 's/[^a-fA-F0-9]//g')"; then
-        echo "unable to retrieve QEMU package hash from $DEBIAN_PKG_WEB_PAGE, please raise an issue" 2>&1
+        echo "unable to retrieve QEMU package hash from $DEBIAN_PKG_WEB_PAGE, please raise an issue" >&2
         exit 1
     fi
     echo "QEMU package URL: $QEMU_PKG_URL"
