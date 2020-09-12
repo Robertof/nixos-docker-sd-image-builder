@@ -321,8 +321,17 @@ also includes instructions on how to make an image with a bigger one.
 
 - If the execution fails due to missing permissions, sorry -- you need to be able to run containers
   with the `--privileged` Docker flag.
-- Ensure you have enough memory/swap and disk space. This can require up to 8 GiB of RAM and ~6-7
-  GiB of disk space.
+- If you get any error during the "copying store paths to image..." step, this is most likely due
+  to `cptofs` running out of memory. The usage of `cptofs` has been removed in the `master` branch of
+  `nixpkgs`, but it's possible to apply the individual patch that fixed the issue on the 20.03 release
+  as well. Thus, _either_: (see #1)
+  - set `NIXPKGS_BRANCH` to `master` in [`docker/docker-compose.yml`](docker/docker-compose.yml) and
+    rerun with `./run.sh up --build`. **This will build an unstable NixOS build based on `master`.**
+  - or uncomment `APPLY_CPTOFS_PATCH` in [`docker/docker-compose.yml`](docker/docker-compose.yml) and
+    rerun with `./run.sh up --build`. This will apply [this patch](https://github.com/NixOS/nixpkgs/pull/82718)
+    which replaces `cptofs` on top of your chosen branch.
+  - or make sure you have enough memory/swap and disk space, as this can require up to 8 GiB of RAM
+    and ~6-7 GiB of disk space.
 - If the build fails with `cptofs` related errors or something like:
   ```
   Resizing to minimum allowed size
