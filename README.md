@@ -132,6 +132,9 @@ Connect device to local ethernet and ssh with private key (Default user is nixos
 ```sh
 ssh -i /Users/me/.ssh/id_ed25519-rpi nixos@192.168.0.157
 ```
+Please read this for in detail configuration after ssh.
+https://gist.github.com/chrisanthropic/2e6d3645f20da8fd4c1f122113f89c06
+
 ##Resource
 The
 [unofficial wiki](https://nixos.wiki/wiki/NixOS_on_ARM/Raspberry_Pi) contains lots of resources
@@ -160,7 +163,7 @@ both the Pi 3 and Pi 4:
 
 <details>
   <summary>Example configuration for the Pi 3</summary>
-  
+
   ```nix
   # Please read the comments!
   { config, pkgs, lib, ... }:
@@ -231,7 +234,7 @@ both the Pi 3 and Pi 4:
 
 <details>
   <summary>Example configuration for the Pi 4</summary>
-  
+
   ```nix
   # Please read the comments!
   { config, pkgs, lib, ... }:
@@ -381,7 +384,7 @@ Here's how it works in detail:
       notifies the cleanup container using TCP when the build is done.
   - once all the images are built, if emulation is required, `setup-qemu` runs (with privileges),
     and it will:
-    - check if a `binfmt_misc` entry which has the same interpreter name exists 
+    - check if a `binfmt_misc` entry which has the same interpreter name exists
       (`qemu-aarch64-docker-nixos`), removing it if so
     - register `qemu-aarch64-bin` as a `binfmt_misc` handler for AArch64 with the `fix-binary` flag,
       which allows `binfmt_misc` to keep working when the container is destroyed
@@ -391,7 +394,7 @@ Here's how it works in detail:
     - build the image
     - copy the image to `/build` as `root` (shared volume)
     - notify `cleanup-qemu` via a simple `nc` call
-  - last but not least, if emulation is required, `cleanup-qemu` will also be started concurrently 
+  - last but not least, if emulation is required, `cleanup-qemu` will also be started concurrently
     (with privileges), and it will:
     - listen on TCP port `11111` and wait until `build-nixos` connects and unlocks the process
     - after that happens, it will remove `binfmt_misc` handlers that start with `qemu` and leave the
