@@ -1,7 +1,7 @@
 # NixOS Docker-based SD image builder
 This repository allows you to build a custom SD image of NixOS for your Raspberry Pi (or any other
 supported AArch64 device) in about 15-20 minutes on a modern `x86_64` system or about 5 minutes on a
-powerful `AArch64` box, without installing any additional dependencies. 
+powerful `AArch64` box, without installing any additional dependencies.
 
 The default configuration enables OpenSSH out of the box, **allowing to install NixOS on an embedded
 device without attaching a display.**
@@ -26,13 +26,57 @@ Out of the box this supports:
 
 Any other device can be supported by changing the configuration files in [`config/`](config/).
 
-## Quick start
+## Getting started
 
-Start by cloning this repo and opening [`config/sd-image.nix`](config/sd-image.nix) in your favorite
-editor. Then:
+###1. Clone this repo and cd in to it
 
-- choose the target device by following the instructions in the file;
+```sh
+git clone git@github.com:Robertof/nixos-docker-sd-image-builder.git && cd nixos-docker-sd-image-builder
+```
+
+###2. Config build image
+```sh
+vi config/sd-image.nix
+```
+
+- Choose the target device (default Raspberry PI 3)
+```
+  imports = [
+    # uncomment the following to select target device
+    # ./generic-aarch64
+    # ./rpi4
+    ./rpi3
+  ];
+  ```
 - add your SSH key(s) by replacing the existing `ssh-ed25519 ...` placeholder.
+```
+users.extraUsers.nixos.openssh.authorizedKeys.keys = [
+  "ssh-ed25519 AICxckLaE01uWBu327qvAu9rlCxckLaE0uWBu327qvAAAICxckLaD0KeCQRu9rld/tre rpi 3"
+];
+  ```
+- [Optional] Config run.sh if you don't want to install QEMU
+```sh
+vi run.sh
+  ```
+If you don't want QEMU (GUI) make sure `WANTS_EMULATION=`
+```
+# Whether to evaluate `docker-compose.emulation.yml`.
+# leave this blank if you don't want to install QEMU
+WANTS_EMULATION=
+
+case "$(uname -m)" in
+arm|armel|armhf|arm64|armv[4-9]*l|aarch64)
+  # This will use images prefixed with `arm64v8/`, which run natively.
+  export IMAGE_BASE=arm64v8/
+  echo " detected native ARM architecture, disabling emulation and using image base $IMAGE_BASE"
+  ;;
+*)
+  echo " detected non-ARM architecture, enabling emulation"
+  # leave this blank if you don't want to install QEMU
+  WANTS_EMULATION=
+  ;;
+esac
+```
 
 Customize `sd-card.nix` (or add more files) as you like, they will be copied to the container.
 
@@ -41,6 +85,7 @@ _Protip: if you're building for a Raspberry Pi 4 and don't need ZFS, enable
 up the build. Please note that if you have already executed `run.sh` once, you need to rebuild
 the images after changing this flag using `./run.sh up --build`._
 
+###3. Build image
 Finally, ensure that your [Docker](https://www.docker.com/) is set up and you have a working
 installation of [Docker Compose](https://docs.docker.com/compose/), then just run:
 
@@ -48,9 +93,12 @@ installation of [Docker Compose](https://docs.docker.com/compose/), then just ru
 ./run.sh
 ```
 
+_If you encounter_ ```Error while copying store paths to image``` _refer to issue #1_
+
 The script is just a wrapper around `docker-compose` which makes sure that the right parameters
 are passed to it.
 
+###4. Clean up
 And that's all! Once the execution is done, a `.img` file will be produced and copied in this
 directory. To free up the space used by the containers, just run:
 
@@ -77,9 +125,18 @@ branch._
 Once an image is produced by the container it's sufficient to flash it to the SD card of your
 choice with any tool which can flash raw images onto block devices. There have been some reports
 of issues using Etcher on macOS, thus it might be easier to just use
-[`dd`](https://wiki.archlinux.org/index.php/USB_flash_installation_media#Using_dd).
+[`dd`](https://wiki.archlinux.org/index.php/USB_flash_installation_media#Using_dd) or [`Raspberry Pi Imager`](https://www.raspberrypi.org/blog/raspberry-pi-imager-imaging-utility/)(GUI).
 
-Hopefully, the flashed SD card should _just work_ on your device. The
+Hopefully, the flashed SD card should _just work_ on your device.
+Connect device to local ethernet and ssh with private key (Default user is nixos)
+```sh
+ssh -i /Users/me/.ssh/id_ed25519-rpi nixos@192.168.0.157
+```
+Please read this for in detail configuration after ssh.
+https://gist.github.com/chrisanthropic/2e6d3645f20da8fd4c1f122113f89c06
+
+##Resource
+The
 [unofficial wiki](https://nixos.wiki/wiki/NixOS_on_ARM/Raspberry_Pi) contains lots of resources
 for possible things you might need or that might go wrong when using NixOS on a Raspberry Pi.
 Check out the page for [all ARM devices](https://nixos.wiki/wiki/NixOS_on_ARM) too.
@@ -106,7 +163,7 @@ both the Pi 3 and Pi 4:
 
 <details>
   <summary>Example configuration for the Pi 3</summary>
-  
+
   ```nix
   # Please read the comments!
   { config, pkgs, lib, ... }:
@@ -177,7 +234,7 @@ both the Pi 3 and Pi 4:
 
 <details>
   <summary>Example configuration for the Pi 4</summary>
-  
+
   ```nix
   # Please read the comments!
   { config, pkgs, lib, ... }:
@@ -327,7 +384,7 @@ Here's how it works in detail:
       notifies the cleanup container using TCP when the build is done.
   - once all the images are built, if emulation is required, `setup-qemu` runs (with privileges),
     and it will:
-    - check if a `binfmt_misc` entry which has the same interpreter name exists 
+    - check if a `binfmt_misc` entry which has the same interpreter name exists
       (`qemu-aarch64-docker-nixos`), removing it if so
     - register `qemu-aarch64-bin` as a `binfmt_misc` handler for AArch64 with the `fix-binary` flag,
       which allows `binfmt_misc` to keep working when the container is destroyed
@@ -337,7 +394,7 @@ Here's how it works in detail:
     - build the image
     - copy the image to `/build` as `root` (shared volume)
     - notify `cleanup-qemu` via a simple `nc` call
-  - last but not least, if emulation is required, `cleanup-qemu` will also be started concurrently 
+  - last but not least, if emulation is required, `cleanup-qemu` will also be started concurrently
     (with privileges), and it will:
     - listen on TCP port `11111` and wait until `build-nixos` connects and unlocks the process
     - after that happens, it will remove `binfmt_misc` handlers that start with `qemu` and leave the

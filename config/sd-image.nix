@@ -1,9 +1,8 @@
 { lib, ... }: {
   imports = [
-    # Select your destination system here. Available choices are:
-    # - generic-aarch64
-    # - rpi3 (alias for generic-aarch64)
-    # - rpi4
+    # uncomment the following to select target device
+    # ./generic-aarch64
+    # ./rpi4
     ./rpi3
   ];
 
