@@ -1,7 +1,7 @@
 { lib, ... }: {
   imports = [
-    # uncomment the following to select target device
-    # ./generic-aarch64
+    ## Uncomment at most one of the following to select the target system:
+    # ./generic-aarch64 # (note: this is the same as 'rpi3')
     # ./rpi4
     ./rpi3
   ];

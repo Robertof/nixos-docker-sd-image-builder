@@ -14,7 +14,6 @@ echo "detecting architecture..."
 export IMAGE_BASE=
 
 # Whether to evaluate `docker-compose.emulation.yml`.
-# leave WANTS_EMULATION= blank if you don't want to install QEMU
 WANTS_EMULATION=
 
 case "$(uname -m)" in
@@ -25,7 +24,7 @@ arm|armel|armhf|arm64|armv[4-9]*l|aarch64)
   ;;
 *)
   echo " detected non-ARM architecture, enabling emulation"
-  # leave WANTS_EMULATION= blank if you don't want to install QEMU
+  # [!] Leave WANTS_EMULATION= blank if you don't want to setup emulation with QEMU.
   WANTS_EMULATION=y
   ;;
 esac

@@ -28,64 +28,51 @@ Any other device can be supported by changing the configuration files in [`confi
 
 ## Getting started
 
-###1. Clone this repo and cd in to it
+### Cloning
 
-```sh
-git clone git@github.com:Robertof/nixos-docker-sd-image-builder.git && cd nixos-docker-sd-image-builder
-```
+First, clone this repo and move in its directory:
+  ```sh
+  git clone https://github.com/Robertof/nixos-docker-sd-image-builder && cd nixos-docker-sd-image-builder
+  ```
 
-###2. Config build image
-```sh
-vi config/sd-image.nix
-```
+### Configuration
 
-- Choose the target device (default Raspberry PI 3)
-```
+Then, customize [`config/sd-image.nix`](config/sd-image.nix)
+(or add more files to the `config` folder) as you like:
+
+1. Choose the target device (default is Raspberry Pi 3):
+  ```nix
   imports = [
-    # uncomment the following to select target device
+    ## keep ONLY one of the following uncommented to select target device
     # ./generic-aarch64
     # ./rpi4
     ./rpi3
   ];
   ```
-- add your SSH key(s) by replacing the existing `ssh-ed25519 ...` placeholder.
-```
-users.extraUsers.nixos.openssh.authorizedKeys.keys = [
-  "ssh-ed25519 AICxckLaE01uWBu327qvAu9rlCxckLaE0uWBu327qvAAAICxckLaD0KeCQRu9rld/tre rpi 3"
-];
+2. Add your SSH key(s) by replacing the existing `ssh-ed25519 ...` placeholder.
+  ```nix
+  users.extraUsers.nixos.openssh.authorizedKeys.keys = [
+    "your-key-goes-here!"
+  ];
   ```
-- [Optional] Config run.sh if you don't want to install QEMU
-```sh
-vi run.sh
-  ```
-If you don't want QEMU (GUI) make sure `WANTS_EMULATION=`
-```
-# Whether to evaluate `docker-compose.emulation.yml`.
-# leave this blank if you don't want to install QEMU
-WANTS_EMULATION=
-
-case "$(uname -m)" in
-arm|armel|armhf|arm64|armv[4-9]*l|aarch64)
-  # This will use images prefixed with `arm64v8/`, which run natively.
-  export IMAGE_BASE=arm64v8/
-  echo " detected native ARM architecture, disabling emulation and using image base $IMAGE_BASE"
-  ;;
-*)
-  echo " detected non-ARM architecture, enabling emulation"
-  # leave this blank if you don't want to install QEMU
-  WANTS_EMULATION=
-  ;;
-esac
-```
-
-Customize `sd-card.nix` (or add more files) as you like, they will be copied to the container.
 
 _Protip: if you're building for a Raspberry Pi 4 and don't need ZFS, enable
 `DISABLE_ZFS_IN_INSTALLER` in [`docker/docker-compose.yml`](docker/docker-compose.yml) to speed
 up the build. Please note that if you have already executed `run.sh` once, you need to rebuild
 the images after changing this flag using `./run.sh up --build`._
 
-###3. Build image
+<details>
+  <summary>If you don't want to setup QEMU and/or `binfmt_misc` on the host system...</summary>
+  The run script will automatically detect if you're already running on AArch64 and avoid setting
+  up QEMU if that's the case. If you already have a working installation of QEMU with `binfmt_misc`
+  set up or want to avoid emulation altogether, then open `run.sh` and remove
+  any mention of `WANTS_EMULATION=y`. Note that when emulation is enabled Docker will interact
+  with the host kernel to set up a `binfmt_misc` handler to execute AArch64 binaries -- due to
+  this, some containers have to be executed with the `--privileged` flag.
+</details>
+
+### Building
+
 Finally, ensure that your [Docker](https://www.docker.com/) is set up and you have a working
 installation of [Docker Compose](https://docs.docker.com/compose/), then just run:
 
@@ -93,21 +80,19 @@ installation of [Docker Compose](https://docs.docker.com/compose/), then just ru
 ./run.sh
 ```
 
-_If you encounter_ ```Error while copying store paths to image``` _refer to issue #1_
-
 The script is just a wrapper around `docker-compose` which makes sure that the right parameters
 are passed to it.
 
-###4. Clean up
+Check out the **Troubleshooting** section for common things that might go wrong.
+
+### Cleanup
+
 And that's all! Once the execution is done, a `.img` file will be produced and copied in this
 directory. To free up the space used by the containers, just run:
 
 ```sh
 ./run.sh down --rmi all -v
 ```
-
-**WARNING**: This interacts with the host kernel to set up a `binfmt_misc` handler to execute
-AArch64 binaries. Due to this, some containers have to be executed with the `--privileged` flag.
 
 ## Building on AWS (EC2)
 
@@ -125,17 +110,20 @@ branch._
 Once an image is produced by the container it's sufficient to flash it to the SD card of your
 choice with any tool which can flash raw images onto block devices. There have been some reports
 of issues using Etcher on macOS, thus it might be easier to just use
-[`dd`](https://wiki.archlinux.org/index.php/USB_flash_installation_media#Using_dd) or [`Raspberry Pi Imager`](https://www.raspberrypi.org/blog/raspberry-pi-imager-imaging-utility/)(GUI).
+[`dd`](https://wiki.archlinux.org/index.php/USB_flash_installation_media#Using_dd)
+or [`Raspberry Pi Imager`](https://www.raspberrypi.org/blog/raspberry-pi-imager-imaging-utility/)(GUI).
 
-Hopefully, the flashed SD card should _just work_ on your device.
-Connect device to local ethernet and ssh with private key (Default user is nixos)
+Hopefully, the flashed SD card should _just work_ on your device. Just check your network for the
+IP of your Raspberry Pi and connect using SSH and the key you specified:
+
 ```sh
-ssh -i /Users/me/.ssh/id_ed25519-rpi nixos@192.168.0.157
+ssh -i $PATH_TO_YOUR_KEY nixos@10.0.0.123
 ```
-Please read this for in detail configuration after ssh.
-https://gist.github.com/chrisanthropic/2e6d3645f20da8fd4c1f122113f89c06
 
-##Resource
+See the section **Platform-specific steps** for further details about your platform.
+
+### Resources
+
 The
 [unofficial wiki](https://nixos.wiki/wiki/NixOS_on_ARM/Raspberry_Pi) contains lots of resources
 for possible things you might need or that might go wrong when using NixOS on a Raspberry Pi.
