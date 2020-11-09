@@ -22,7 +22,7 @@
   systemd.services.sshd.wantedBy = lib.mkOverride 40 [ "multi-user.target" ];
 
   # Enable OpenSSH out of the box.
-  services.sshd.enabled = true;
+  services.sshd.enable = true;
 
   # Wireless networking (1). You might want to enable this if your Pi is not attached via Ethernet.
   #networking.wireless = {
