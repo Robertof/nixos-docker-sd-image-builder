@@ -7,7 +7,7 @@ ARG NIXPKGS_BRANCH
 ARG APPLY_CPTOFS_PATCH
 ARG DISABLE_ZFS_IN_INSTALLER
 
-RUN apk add curl git sudo patch
+RUN apk add curl git sudo patch xz
 RUN adduser -D nixos
 RUN mkdir -m 0755 /nix
 RUN chown nixos /nix
