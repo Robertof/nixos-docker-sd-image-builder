@@ -71,7 +71,7 @@ the images after changing this flag using `./run.sh up --build`._
   this, some containers have to be executed with the `--privileged` flag.
 </details>
 
-### Building
+### Building with Docker
 
 Finally, ensure that your [Docker](https://www.docker.com/) is set up and you have a working
 installation of [Docker Compose](https://docs.docker.com/compose/), then just run:
@@ -85,7 +85,7 @@ are passed to it.
 
 Check out the **Troubleshooting** section for common things that might go wrong.
 
-### Cleanup
+#### Cleanup Docker
 
 And that's all! Once the execution is done, a `.img` file will be produced and copied in this
 directory. To free up the space used by the containers, just run:
@@ -94,7 +94,7 @@ directory. To free up the space used by the containers, just run:
 ./run.sh down --rmi all -v
 ```
 
-## Building on AWS (EC2)
+### Building on AWS (EC2)
 
 To quickly build an SD image using a native AArch64 EC2 instance, head over to the
 [`packer/`](packer/) subdirectory which has a [Packer](https://www.packer.io/)
