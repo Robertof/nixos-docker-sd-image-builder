@@ -33,6 +33,14 @@
     "8250.nr_uarts=1"
   ];
 
+  # Remove some kernel modules added for AllWinner SOCs that are not available
+  # for RPi's kernel.
+  # See: https://git.io/JOlb3
+  boot.initrd.availableKernelModules = [
+    # Allows early (earlier) modesetting for the Raspberry Pi
+    "vc4" "bcm2835_dma" "i2c_bcm2835"
+  ];
+
   sdImage = {
     # This might need to be increased when deploying multiple configurations.
     firmwareSize = 128;
