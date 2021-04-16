@@ -44,6 +44,7 @@ source "amazon-ebs" "nixos_sd_image_builder" {
   }
 
   ssh_username = "admin"
+  ssh_interface = "public_ip"
 }
 
 build {
