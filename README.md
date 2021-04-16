@@ -133,21 +133,19 @@ Check out the page for [all ARM devices](https://nixos.wiki/wiki/NixOS_on_ARM) t
 
 #### Raspberry Pi 3 and 4
 
-Once your Pi boots and you're logged in, you can generate a barebones configuration using
-`nixos-generate-config`.
+Once your Pi boots and you're logged in, the NixOS installer is ready to use. To proceed with the
+_installation_, a system configuration needs to be created:
 
-Please keep in mind the following:
-
-- the _installer configuration_ (which is the one you edited in the [`config/`](config/) folder) is
+- The _installer configuration_ (which is the one you edited in the [`config/`](config/) folder) is
   _different_ than the system configuration. The installer configuration is only used to build
-  the image -- **using an installer configuration on a production system is an error and will
-  lead to weirdness.**
-- the _system configuration_ will _not_ inherit from the installer configuration, thus any
-  relevant options (such as users, SSH keys, networking etc.) have to be configured again. Please
-  note that once you switch to the main system configuration **the `nixos` user will be removed**.
+  the image -- **using an installer configuration on a production system will not work properly.**
+- The _system configuration_ applies to your final working system and will _not_ inherit from the
+  previously modified installer configuration. As such, any relevant options (such as users,
+  SSH keys, networking etc.) have to be configured again. Please note that once you switch
+  to the main system configuration **the `nixos` user will be removed**.
 
-That being said, here are some example _system configurations_ that are mostly ready to use for
-both the Pi 3 and Pi 4:
+To generate a barebones system configuration, run `nixos-generate-config`, or use any of the
+following _system configurations_ which are mostly ready to use for both the Pi 3 and 4:
 
 <details>
   <summary>Example configuration for the Pi 3</summary>
