@@ -22,7 +22,16 @@
   # Increase `cma` to 64M to allow to use all of the RAM.
   # NOTE: this disables the serial console. Add
   # "console=ttyS0,115200n8" "console=ttyAMA0,115200n8" to restore.
-  boot.kernelParams = ["cma=64M" "console=tty0"];
+  boot.kernelParams = [
+    # Increase `cma` to 64M to allow to use all of the RAM.
+    "cma=64M"
+    "console=tty0"
+    # To enable the serial console, uncomment the following line.
+    # "console=ttyS0,115200n8" "console=ttyAMA0,115200n8"
+    # Some Raspberry Pi 4s fail to boot correctly without the following. See
+    # issue #20.
+    "8250.nr_uarts=1"
+  ];
 
   sdImage = {
     # This might need to be increased when deploying multiple configurations.
