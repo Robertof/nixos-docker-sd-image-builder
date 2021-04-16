@@ -310,6 +310,10 @@ also includes instructions on how to make an image with a bigger one.
 
 - If the execution fails due to missing permissions, sorry -- you need to be able to run containers
   with the `--privileged` Docker flag.
+- If your system doesn't survive the first reboot after applying the final system configuration due
+  to an error like "Did not find a cmdline Flattened Device Tree", please see #24 for troubleshooting
+  steps and suggested configuration options to resolve the issue. Feel free to open another issue if
+  the problem persists!
 - If you get any error during the "copying store paths to image..." step, this is most likely due
   to `cptofs` running out of memory. The usage of `cptofs` has been removed in the `master` branch of
   `nixpkgs`, but it's possible to apply the individual patch that fixed the issue on the 20.03 release
