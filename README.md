@@ -13,6 +13,22 @@ allow transparent execution of AArch64 binaries.
 A Packer specification is provided in [`packer/`](packer/) which allows to build an
 SD image using a native AArch64 instance provided by Amazon EC2. It takes less than 10 minutes!
 
+## A note about SSH and headless installation
+
+Since [September 2020](https://github.com/NixOS/nixpkgs/pull/96991) (or NixOS 20.09), OpenSSH is
+now enabled by default in pre-built NixOS SD images. However, **NixOS does not ship with a default
+password nor keypair for security reasons**, which means you will have to insert an SSH key manually
+after you have flashed the image to an SD card. Usually, this is an easier and faster process than
+using this repository to build a brand-new NixOS image if you just want to use NixOS headlessly.
+This can be done by mounting the SD card block device on a Linux system and adding the key in
+`/home/nixos/.ssh/authorized_keys` or `/root/.ssh/authorized_keys` with the appropriate
+permissions, or by `chroot`ing and running `passwd`. See
+[the official documentation](https://nixos.org/manual/nixos/stable/#sec-installation-booting-networking)
+for more information about this process.
+
+This project is still useful in case you want to have further customization capabilities on your
+installer image, or in case you want pre-baked images with your SSH key already in them.
+
 ## Supported devices
 
 Out of the box this supports:
