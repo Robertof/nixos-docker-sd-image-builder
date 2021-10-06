@@ -49,5 +49,14 @@ else
   fi
 fi
 
+if [[ -n "$WANTS_EMULATION" ]] && [[ "$COMPOSE_ACTION" = "up" ]]; then
+  echo "figuring out if docker-compose >= 2.0.0 workaround is needed..."
+  readonly COMPOSE_VERSION="$(docker-compose version --short)"
+  if [[ "${COMPOSE_VERSION%%.*}" -ge 2 ]]; then
+    echo "  detected docker-compose $COMPOSE_VERSION, pre-building images"
+    $DOCKER_COMPOSE $COMPOSE_ARGS build
+  fi
+fi
+
 set -x
 $DOCKER_COMPOSE $COMPOSE_ARGS $COMPOSE_ACTION "$@"
