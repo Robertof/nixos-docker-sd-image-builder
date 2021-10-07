@@ -13,17 +13,10 @@ Ensure your [Packer](https://www.packer.io/) install is up to date, then just ru
 packer build build.pkr.hcl
 ```
 
-This will set everything up, (hopefully) build an image and download it.
+This will set everything up, (hopefully) build an image and download it. If everything worked,
+you should see towards the end of your output something like:
 
-**IMPORTANT: since there is [no way](https://github.com/hashicorp/packer/pull/4681) to prevent Packer
-from creating an AMI, the execution will error right after the image is copied to the local disk.
-This will be the output:**
-
-**```Build 'amazon-ebs' errored: Script exited with non-zero exit status: 1.Allowed exit codes are: [0]```**
-
-**Don't be alarmed, look a few lines above and you should see something like:**
-
-**```Image successfully built and downloaded as nixos-sd-image-20.03pre-git-aarch64-linux.img```**
+```Image successfully built and downloaded as nixos-sd-image-20.03pre-git-aarch64-linux.img```
 
 By default, this will run on the `us-east-2` region and it will use `us-east-2a` as the
 availability zone. To change this, run Packer as follows:
