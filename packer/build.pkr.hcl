@@ -24,6 +24,12 @@ source "amazon-ebs" "nixos_sd_image_builder" {
   # in about 5 minutes.
   spot_instance_types = ["a1.2xlarge"]
   spot_price          = "auto"
+  skip_create_ami     = true
+
+  fleet_tags = {
+    # Workaround for https://github.com/hashicorp/packer-plugin-amazon/issues/92
+    Name = "nixos_sd_image_builder-{{ timestamp }}"
+  }
 
   source_ami_filter {
     filters = {
@@ -93,11 +99,7 @@ build {
 
   provisioner "shell-local" {
     inline = [
-      "echo 'Image *successfully* built and downloaded as' nixos*",
-      "echo 'To prevent Packer from creating an AMI, this will now produce a failed exit code.'",
-      "echo ' to learn why, see: https://github.com/hashicorp/packer/pull/4681'",
-      "echo 'NOTE: the process was successful!'",
-      "exit 1"
+      "echo 'Image *successfully* built and downloaded as' nixos*"
     ]
   }
 }
