@@ -19,16 +19,4 @@ echo 'trap "echo build done | nc cleanup-qemu 11111 2>/dev/null || echo cleanup 
 echo "cloning nix packages..."
 git clone --depth=1 -b "$NIXPKGS_BRANCH" "$NIXPKGS_URL" nixpkgs
 
-cd nixpkgs
-
-if [ -n "${APPLY_CPTOFS_PATCH+x}" ]; then
-  echo "applying patch to make-ext4-fs script..."
-  curl -L "https://github.com/NixOS/nixpkgs/pull/82718.patch" | git apply || echo "warning: make-ext4-fs/cptofs patch failed to apply, might already be applied" 2>&1
-fi
-
-if [ -n "${DISABLE_ZFS_IN_INSTALLER+x}" ]; then
-  echo "disabling zfs..."
-  patch nixos/modules/profiles/base.nix $HOME/disable-zfs.patch
-fi
-
 echo "image is ready"

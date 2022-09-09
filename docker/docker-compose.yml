@@ -14,20 +14,7 @@ services:
       args:
         IMAGE_BASE: $IMAGE_BASE
         NIXPKGS_URL: "https://github.com/nixos/nixpkgs"
-        NIXPKGS_BRANCH: "release-20.09"
-        # Applies https://github.com/NixOS/nixpkgs/pull/82718 on top of the cloned tree.
-        # Enable this if your build fails due to cptofs errors (including "cannot allocate memory")
-        # or when having a filesystem resizing failure due to `resize2fs`.
-        # note: to disable, comment or remove this -- changing its value will have no effects.
-        # note: if changing this after having already executed `run.sh`, the containers need to
-        # be rebuilt with `./run.sh up --build`.
-        # note: this PR was merged on the `master` branch.
-        #APPLY_CPTOFS_PATCH: "y"
-        # Disables ZFS support in the installer. This can significantly reduce build times
-        # of the Raspberry Pi 4 image.
-        # note: if changing this after having already executed `run.sh`, the containers need to
-        # be rebuilt with `./run.sh up --build`.
-        #DISABLE_ZFS_IN_INSTALLER: "y"
+        NIXPKGS_BRANCH: "release-22.05"
     working_dir: /home/nixos
     # Main command line, left here so it can be changed easily. The container will:
     # - setup the environment. This includes adding the Nix executables to $PATH, along with the

@@ -1,7 +1,7 @@
 { lib, ... }: {
   imports = [
     ## Uncomment at most one of the following to select the target system:
-    # ./generic-aarch64 # (note: this is the same as 'rpi3')
+    # ./generic-aarch64 # (note: this is the same as 'rpi3' and 'rpi4')
     # ./rpi4
     ./rpi3
   ];

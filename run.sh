@@ -9,8 +9,8 @@ fi
 
 echo "detecting architecture..."
 
-# Image base to use. The trick to allow this to work painlessly on both x86 and AArch64 is just
-# a magic trick which involves prepending `arm64v8/` when building natively.
+# Image base to use. The magic trick that allows this to work painlessly on both x86 and AArch64 is
+# just the `arm64v8/` prefix when building natively.
 export IMAGE_BASE=
 
 # Whether to evaluate `docker-compose.emulation.yml`.

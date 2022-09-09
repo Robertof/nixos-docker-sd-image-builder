@@ -6,9 +6,11 @@ powerful `AArch64` box, without installing any additional dependencies.
 The default configuration enables OpenSSH out of the box, **allowing to install NixOS on an embedded
 device without attaching a display.**
 
-**This works both on `x86_64` systems and native `AArch64` builders**. When needed, QEMU is
+**This works both on `x86_64` and `AArch64` (ARM64) systems**. When needed, QEMU is
 used to emulate `AArch64` and [`binfmt_misc`](https://en.wikipedia.org/wiki/Binfmt_misc) is used to
-allow transparent execution of AArch64 binaries.
+allow transparent execution of AArch64 binaries. By default this builds **NixOS 22.05**, though
+you can build any other version by amending `NIXPKGS_BRANCH` in
+[`docker/docker-compose.yml`](docker/docker-compose.yml).
 
 A Packer specification is provided in [`packer/`](packer/) which allows to build an
 SD image using a native AArch64 instance provided by Amazon EC2. It takes less than 10 minutes!
@@ -31,14 +33,9 @@ installer image, or in case you want pre-baked images with your SSH key already 
 
 ## Supported devices
 
-Out of the box this supports:
-
-- any device supported by the `sd-image-aarch64` builder of NixOS. This includes the
-  **Raspberry Pi 3** and other devices listed [here](https://nixos.wiki/wiki/NixOS_on_ARM).
-- **Raspberry Pi 4.** Please note that the latest Raspberry Pi 4 model with 8 GiB of RAM
-  is supported upstream only when building an image from the unstable branch. To do that,
-  open [`docker/docker-compose.yml`](docker/docker-compose.yml) and change `NIXPKGS_BRANCH`
-  to `master`.
+Out of the box this supports any device supported by the `sd-image-aarch64` builder of NixOS.
+This includes the **Raspberry Pi 3**, **Raspberry Pi 4** and other devices listed
+[here](https://nixos.wiki/wiki/NixOS_on_ARM).
 
 Any other device can be supported by changing the configuration files in [`config/`](config/).
 
@@ -72,11 +69,6 @@ Then, customize [`config/sd-image.nix`](config/sd-image.nix)
   ];
   ```
 
-_Protip: if you're building for a Raspberry Pi 4 and don't need ZFS, enable
-`DISABLE_ZFS_IN_INSTALLER` in [`docker/docker-compose.yml`](docker/docker-compose.yml) to speed
-up the build. Please note that if you have already executed `run.sh` once, you need to rebuild
-the images after changing this flag using `./run.sh up --build`._
-
 <details>
   <summary>If you don't want to setup QEMU and/or `binfmt_misc` on the host system...</summary>
   The run script will automatically detect if you're already running on AArch64 and avoid setting
@@ -107,7 +99,7 @@ And that's all! Once the execution is done, a `.img` file will be produced and c
 directory. To free up the space used by the containers, just run:
 
 ```sh
-./run.sh down --rmi all -v
+./cleanup.sh
 ```
 
 ### Building on AWS (EC2)
@@ -160,154 +152,9 @@ _installation_, a system configuration needs to be created:
   SSH keys, networking etc.) have to be configured again. Please note that once you switch
   to the main system configuration **the `nixos` user will be removed**.
 
-To generate a barebones system configuration, run `nixos-generate-config`, or use any of the
-following _system configurations_ which are mostly ready to use for both the Pi 3 and 4:
-
-<details>
-  <summary>Example configuration for the Pi 3</summary>
-
-  ```nix
-  # Please read the comments!
-  { config, pkgs, lib, ... }:
-  {
-    # Boot
-    boot.loader.grub.enable = false;
-    boot.loader.raspberryPi.enable = true;
-    boot.loader.raspberryPi.version = 3;
-    boot.loader.raspberryPi.uboot.enable = true;
-
-    # Kernel configuration
-    boot.kernelPackages = pkgs.linuxPackages_latest;
-    boot.kernelParams = ["cma=32M"];
-
-    # Enable additional firmware (such as Wi-Fi drivers).
-    hardware.enableRedistributableFirmware = true;
-
-    # Filesystems
-    fileSystems = {
-      "/" = {
-        device = "/dev/disk/by-label/NIXOS_SD";
-        fsType = "ext4";
-      };
-    };
-    swapDevices = [ { device = "/swapfile"; size = 1024; } ];
-
-    # Networking (see official manual or `/config/sd-image.nix` in this repo for other options)
-    networking.hostName = "nixpi"; # unleash your creativity!
-
-    # Packages
-    environment.systemPackages = with pkgs; [
-      # customize as needed!
-      vim git htop
-    ];
-
-    # Users
-    # === IMPORTANT ===
-    # Change `yourName` here with the name you'd like for your user!
-    users.users.yourName = {
-      isNormalUser = true;
-      # Don't forget to change the home directory too.
-      home = "/home/yourName";
-      # This allows this user to use `sudo`.
-      extraGroups = [ "wheel" ];
-      # SSH authorized keys for this user.
-      openssh.authorizedKeys.keys = [ "ssh-ed25519 ..." ];
-    };
-
-    # Miscellaneous
-    time.timeZone = "Europe/Rome"; # you probably want to change this -- otherwise, ciao!
-    services.openssh.enable = true;
-
-    # WARNING: if you remove this, then you need to assign a password to your user, otherwise
-    # `sudo` won't work. You can do that either by using `passwd` after the first rebuild or
-    # by setting an hashed password in the `users.users.yourName` block as `initialHashedPassword`.
-    security.sudo.wheelNeedsPassword = false;
-
-    # Nix
-    nix.gc.automatic = true;
-    nix.gc.options = "--delete-older-than 30d";
-    boot.cleanTmpDir = true;
-
-    # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-    system.stateVersion = "20.03";
-  }
-  ```
-</details>
-
-<details>
-  <summary>Example configuration for the Pi 4</summary>
-
-  ```nix
-  # Please read the comments!
-  { config, pkgs, lib, ... }:
-  {
-    # Boot
-    boot.loader.grub.enable = false;
-    boot.loader.raspberryPi.enable = true;
-    boot.loader.raspberryPi.version = 4;
-
-    # Kernel configuration
-    boot.kernelPackages = pkgs.linuxPackages_rpi4;
-    boot.kernelParams = ["cma=64M" "console=tty0"];
-
-    # Enable additional firmware (such as Wi-Fi drivers).
-    hardware.enableRedistributableFirmware = true;
-
-    # Filesystems
-    fileSystems = {
-        # There is no U-Boot on the Pi 4 (yet) -- the firmware partition has to be mounted as /boot.
-        "/boot" = {
-            device = "/dev/disk/by-label/FIRMWARE";
-            fsType = "vfat";
-        };
-        "/" = {
-            device = "/dev/disk/by-label/NIXOS_SD";
-            fsType = "ext4";
-        };
-    };
-
-    swapDevices = [ { device = "/swapfile"; size = 1024; } ];
-
-    # Networking (see official manual or `/config/sd-image.nix` in this repo for other options)
-    networking.hostName = "nixpi"; # unleash your creativity!
-
-    # Packages
-    environment.systemPackages = with pkgs; [
-      # customize as needed!
-      vim git htop
-    ];
-
-    # Users
-    # === IMPORTANT ===
-    # Change `yourName` here with the name you'd like for your user!
-    users.users.yourName = {
-      isNormalUser = true;
-      # Don't forget to change the home directory too.
-      home = "/home/yourName";
-      # This allows this user to use `sudo`.
-      extraGroups = [ "wheel" ];
-      # SSH authorized keys for this user.
-      openssh.authorizedKeys.keys = [ "ssh-ed25519 ..." ];
-    };
-
-    # Miscellaneous
-    time.timeZone = "Europe/Rome"; # you probably want to change this -- otherwise, ciao!
-    services.openssh.enable = true;
-
-    # WARNING: if you remove this, then you need to assign a password to your user, otherwise
-    # `sudo` won't work. You can do that either by using `passwd` after the first rebuild or
-    # by setting an hashed password in the `users.users.yourName` block as `initialHashedPassword`.
-    security.sudo.wheelNeedsPassword = false;
-
-    # Nix
-    nix.gc.automatic = true;
-    nix.gc.options = "--delete-older-than 30d";
-
-    # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-    system.stateVersion = "20.03";
-  }
-  ```
-</details>
+You can generate a barebones system configuration by running `nixos-generate-config`. The
+["Installing NixOS on a Raspberry Pi"](https://nix.dev/tutorials/installing-nixos-on-a-raspberry-pi)
+guide contains many useful details on how to get a working system up, as well as example configs.
 
 Once you have a valid configuration in `/etc/nixos/configuration.nix`, run `nixos-rebuild switch`
 as `root`, and optionally run `nix-collect-garbage -d` to remove all the leftover stuff from the
@@ -315,7 +162,8 @@ installation that is not required.
 
 For the Pi 3, see also
 [this excellent blog post](https://citizen428.net/blog/installing-nixos-raspberry-pi-3)
-which has step-by-step instructions for the whole process.
+which has step-by-step instructions for the whole process. (Note that this may be out of date as
+of 2022.)
 
 For the Pi 4, you might want to check
 [these amazing instructions](https://gist.github.com/chrisanthropic/2e6d3645f20da8fd4c1f122113f89c06)
@@ -330,35 +178,20 @@ also includes instructions on how to make an image with a bigger one.
   to an error like "Did not find a cmdline Flattened Device Tree", please see #24 for troubleshooting
   steps and suggested configuration options to resolve the issue. Feel free to open another issue if
   the problem persists!
-- If you get any error during the "copying store paths to image..." step, this is most likely due
-  to `cptofs` running out of memory. The usage of `cptofs` has been removed in the `master` branch of
-  `nixpkgs`, but it's possible to apply the individual patch that fixed the issue on the 20.03 release
-  as well. Thus, _either_: (see #1)
-  - set `NIXPKGS_BRANCH` to `master` in [`docker/docker-compose.yml`](docker/docker-compose.yml) and
-    rerun with `./run.sh up --build`. **This will build an unstable NixOS build based on `master`.**
-  - or uncomment `APPLY_CPTOFS_PATCH` in [`docker/docker-compose.yml`](docker/docker-compose.yml) and
-    rerun with `./run.sh up --build`. This will apply [this patch](https://github.com/NixOS/nixpkgs/pull/82718)
-    which replaces `cptofs` on top of your chosen branch.
-  - or make sure you have enough memory/swap and disk space, as this can require up to 8 GiB of RAM
-    and ~6-7 GiB of disk space.
-- If the build fails with `cptofs` related errors or something like:
-  ```
-  Resizing to minimum allowed size
-  resize2fs 1.45.5 (07-Jan-2020)
-  Please run 'e2fsck -f temp.img' first.
-  ```
-  This is a known issue (see [[1]](https://github.com/NixOS/nixpkgs/pull/86366) and
-  [[2]](https://github.com/NixOS/nixpkgs/pull/82718)). Please edit
-  `docker-compose.yml`, uncomment `APPLY_CPTOFS_PATCH` and rerun with `./run.sh up --build`.
-  If you want to learn more, I
-  [investigated this issue and wrote about it](https://rbf.dev/blog/2020/04/why-doesnt-resize2fs-resize-my-fs/).
+- If you get any error during the "copying store paths to image..." step
+  (including `resize2fs` errors), this is most likely due to `cptofs` woes.
+  The usage of `cptofs` has been removed in the `nixpkgs` tree since at least 2020, so this repo
+  phased out any workaround for those issues. If you need to build an older NixOS version, check out
+  an earlier commit of this repository.
 - If you are running Docker Toolbox on Windows, you might encounter weird "file not found" errors
   when Nix attempts to find your configuration files. This is due to the fact that Docker Toolbox
   uses VirtualBox to run Docker and `C:\Users` is the only directory shared by default -- thus,
   if you're storing your files in any other path you might run into the issue.
   Follow [the instructions detailed in this great post](https://web.archive.org/web/20200521000637/https://headsigned.com/posts/mounting-docker-volumes-with-docker-toolbox-for-windows/)
   for ways to solve this. Thanks @dsferruzza!
-- Failing commands like `bsdtar: Error opening archive: Can't initialize filter; unable to run program "zstd -d -qq"` might be due a preexisting alpine image. Delete it and run the script again.
+- Failing commands like
+  `bsdtar: Error opening archive: Can't initialize filter; unable to run program "zstd -d -qq"`
+  might be due a preexisting alpine image. Delete it and run the script again.
 - For any other problem, open an issue or email me!
 
 ## Details
@@ -384,8 +217,8 @@ Here's how it works in detail:
   - then, Docker builds `build-nixos`, which will:
     - create an unprivileged user for the NixOS build.
     - download and bootstrap Nix with the default configuration.
-    - download the specified version/checkout of `nixpkgs`. By default, this downloads `nixpkgs` for
-      the current stable version (20.03).
+    - download the specified version/checkout of `nixpkgs`. By default, this downloads `nixpkgs`
+      22.05.
     - prepare an environment file which adds Nix to `$PATH`, sets `NIX_HOME` and sets a trap which
       notifies the cleanup container using TCP when the build is done.
   - once all the images are built, if emulation is required, `setup-qemu` runs (with privileges),
@@ -405,11 +238,3 @@ Here's how it works in detail:
     - listen on TCP port `11111` and wait until `build-nixos` connects and unlocks the process
     - after that happens, it will remove `binfmt_misc` handlers that start with `qemu` and leave the
       system clean
-
-## TODO
-
-- [x] Use a unique name as the `binfmt_misc` handler so that it's not needed to nuke the other
-  pre-existing QEMU handlers on the system.
-- [x] Use a custom script to register QEMU as a `binfmt_misc` handler instead of patching the
-  original one.
-- [x] Support native `aarch64` compilation
