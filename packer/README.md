@@ -18,11 +18,11 @@ you should see towards the end of your output something like:
 
 ```Image successfully built and downloaded as nixos-sd-image-20.03pre-git-aarch64-linux.img```
 
-By default, this will run on the `us-east-2` region and it will use `us-east-2a` as the
+By default, this will run on the `us-east-1` region and it will use `us-east-1a` as the
 availability zone. To change this, run Packer as follows:
 
 ```sh
-packer build -var 'region=us-east-1' -var 'availability_zone=us-east-1a' build.pkr.hcl
+packer build -var 'region=us-east-2' -var 'availability_zone=us-east-2a' build.pkr.hcl
 ```
 
 ## Details
