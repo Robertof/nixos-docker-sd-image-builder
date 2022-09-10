@@ -32,12 +32,12 @@ source "amazon-ebs" "nixos_sd_image_builder" {
 
   source_ami_filter {
     filters = {
-      name = "debian-10-arm64-*"
+      name = "debian-11-arm64-*"
     }
 
     most_recent = true
 
-    owners = ["136693071363"] # source: https://wiki.debian.org/Cloud/AmazonEC2Image/Buster
+    owners = ["136693071363"] # source: https://wiki.debian.org/Cloud/AmazonEC2Image/Bullseye
   }
 
   # The default volume size of 8 GiB is too small. Use 16.
@@ -79,8 +79,7 @@ build {
   provisioner "shell" {
     inline = [
       "chmod +x run.sh",
-      "sudo apt-get update -y",
-      "sudo apt-get install -y docker.io docker-compose"
+      "curl -fsSL https://get.docker.com | sh"
     ]
   }
 
