@@ -20,7 +20,6 @@ RUN echo -e 'nixos ALL=(ALL) ALL\nnixos ALL=(root) NOPASSWD: /bin/cp' >> /etc/su
 
 COPY --chown=nixos:nixos *.sh /home/nixos/
 COPY --chown=nixos:nixos aarch64-tester /home/nixos/
-COPY --chown=nixos:nixos *.patch /home/nixos/
 
 USER nixos
 ENV USER=nixos

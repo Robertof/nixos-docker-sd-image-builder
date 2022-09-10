@@ -8,12 +8,11 @@
 # NOTE: This requires at least Packer 1.5.0.
 
 variable "region" {
-  default = "us-east-2"
+  default = "us-east-1"
 }
 
 variable "availability_zone" {
-  # note: us-east-2c (used by default) does not have ARM spot instances
-  default = "us-east-2a"
+  default = "us-east-1a"
 }
 
 source "amazon-ebs" "nixos_sd_image_builder" {
