@@ -8,7 +8,7 @@ device without attaching a display.**
 
 **This works both on `x86_64` and `AArch64` (ARM64) systems**. When needed, QEMU is
 used to emulate `AArch64` and [`binfmt_misc`](https://en.wikipedia.org/wiki/Binfmt_misc) is used to
-allow transparent execution of AArch64 binaries. By default this builds **NixOS 22.05**, though
+allow transparent execution of AArch64 binaries. By default this builds **NixOS 23.11**, though
 you can build any other version by amending `NIXPKGS_BRANCH` in
 [`docker/docker-compose.yml`](docker/docker-compose.yml).
 
@@ -218,7 +218,7 @@ Here's how it works in detail:
     - create an unprivileged user for the NixOS build.
     - download and bootstrap Nix with the default configuration.
     - download the specified version/checkout of `nixpkgs`. By default, this downloads `nixpkgs`
-      22.05.
+      23.11.
     - prepare an environment file which adds Nix to `$PATH`, sets `NIX_HOME` and sets a trap which
       notifies the cleanup container using TCP when the build is done.
   - once all the images are built, if emulation is required, `setup-qemu` runs (with privileges),

@@ -14,7 +14,7 @@ services:
       args:
         IMAGE_BASE: $IMAGE_BASE
         NIXPKGS_URL: "https://github.com/nixos/nixpkgs"
-        NIXPKGS_BRANCH: "release-22.05"
+        NIXPKGS_BRANCH: "release-23.11"
     working_dir: /home/nixos
     # Main command line, left here so it can be changed easily. The container will:
     # - setup the environment. This includes adding the Nix executables to $PATH, along with the
