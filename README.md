@@ -8,7 +8,7 @@ device without attaching a display.**
 
 **This works both on `x86_64` and `AArch64` (ARM64) systems**. When needed, QEMU is
 used to emulate `AArch64` and [`binfmt_misc`](https://en.wikipedia.org/wiki/Binfmt_misc) is used to
-allow transparent execution of AArch64 binaries. By default this builds **NixOS 23.11**, though
+allow transparent execution of AArch64 binaries. By default this builds **NixOS 25.11**, though
 you can build any other version by amending `NIXPKGS_BRANCH` in
 [`docker/docker-compose.yml`](docker/docker-compose.yml).
 
