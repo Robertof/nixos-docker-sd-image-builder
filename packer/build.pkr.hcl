@@ -8,20 +8,24 @@
 # NOTE: This requires at least Packer 1.5.0.
 
 variable "region" {
-  default = "us-east-1"
+  default = "us-east-2"
 }
 
-variable "availability_zone" {
-  default = "us-east-1a"
+packer {
+  required_plugins {
+    amazon = {
+      version = ">= 1.2.8"
+      source  = "github.com/hashicorp/amazon"
+    }
+  }
 }
 
 source "amazon-ebs" "nixos_sd_image_builder" {
   ami_name            = "nixos_sd_image_builder"
   region              = var.region
-  availability_zone   = var.availability_zone
   # This instance has 8 cores and 16 GiB of RAM. It is pretty cheap with Spot and builds the image
   # in about 5 minutes.
-  spot_instance_types = ["a1.2xlarge"]
+  spot_instance_types = ["a1.2xlarge", "t4g.2xlarge", "c6gd.2xlarge"]
   spot_price          = "auto"
   skip_create_ami     = true
 
