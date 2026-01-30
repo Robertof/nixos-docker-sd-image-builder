@@ -2,5 +2,5 @@
 set -eu
 
 echo "registering QEMU..."
-sh update-binfmt.sh qemu-aarch64-static
+sh update-binfmt.sh qemu-aarch64
 echo "done!"
